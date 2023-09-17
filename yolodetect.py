@@ -6,14 +6,17 @@ import os
 import datetime
 import threading
 import telegram_utils as telegram
+from dotenv import load_dotenv
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path=dotenv_path)
 
 
 def isInside(points, centroid):
     polygon = Polygon(points)
     centroid = Point(centroid)
-    # print(polygon.contains(centroid))
+    if(os.getenv("debug") =="1"): print(polygon.contains(centroid))
     return polygon.contains(centroid)
 
 
