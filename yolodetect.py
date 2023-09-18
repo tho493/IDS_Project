@@ -64,11 +64,13 @@ class YoloDetect():
     def alert(self, img):
         cv2.putText(img, "ALARM!!!!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         # New thread to send telegram after 15 seconds
+        timenow = datetime.datetime.utcnow()
         if (self.last_alert is None) or (
-                (datetime.datetime.utcnow() - self.last_alert).total_seconds() > self.alert_telegram_each):
-            self.last_alert = datetime.datetime.utcnow()
+                (timenow - self.last_alert).total_seconds() > self.alert_telegram_each):
+            self.last_alert = timenow
             cv2.imwrite(dir_path + "/alert.png", cv2.resize(img, dsize=None, fx=0.2, fy=0.2))
-            thread = threading.Thread(target=telegram.send_message_with_photo("ALARM!!!!", dir_path + "/alert.png"))
+            time = (timenow + datetime.timedelta(hours=7)).strftime("%Y-%m-%d %H:%M:%S")
+            thread = threading.Thread(target=telegram.send_message_with_photo("ALARM!!!!" + "\n" + time + "\n", dir_path + "/alert.png"))
             thread.start()
         return img
 
