@@ -18,8 +18,8 @@ def send_message_with_photo(message, photo_path):
             'chat_id': chat_id,
             'caption': message
         }
-        response = requests.post(url, files=files, data=data)
-        # response = requests.get(url, files=files, data=data)
+        # response = requests.post(url, files=files, data=data)
+        response = requests.get(url, files=files, data=data)
         if response.status_code == 200:
             print("Tin nhắn và ảnh đã được gửi thành công!")
         else:

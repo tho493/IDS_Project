@@ -68,8 +68,7 @@ class YoloDetect():
                 (datetime.datetime.utcnow() - self.last_alert).total_seconds() > self.alert_telegram_each):
             self.last_alert = datetime.datetime.utcnow()
             cv2.imwrite(dir_path + "/alert.png", cv2.resize(img, dsize=None, fx=0.2, fy=0.2))
-            time = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-            thread = threading.Thread(target=telegram.send_message_with_photo("ALARM!!!!" + "\n" + time + "\n", dir_path + "/alert.png"))
+            thread = threading.Thread(target=telegram.send_message_with_photo("ALARM!!!!", dir_path + "/alert.png"))
             thread.start()
         return img
 
