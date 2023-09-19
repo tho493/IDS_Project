@@ -3,7 +3,10 @@ import numpy as np
 from imutils.video import VideoStream
 from yolodetect import YoloDetect
 import os
+from dotenv import load_dotenv
 
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path=dotenv_path)
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 model = YoloDetect()
@@ -11,6 +14,8 @@ model = YoloDetect()
 video = VideoStream(src=0).start()
 
 points = []
+if(os.getenv("enable_send_telegram") == "0"):
+    print("Gửi tin nhắn tới telegram đang bị vô hiệu hóa")
 
 def handle_left_click(event, x, y, flags, points):
     if event == cv2.EVENT_LBUTTONDOWN:
