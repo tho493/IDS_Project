@@ -1,18 +1,15 @@
 import cv2
 import numpy as np
-from imutils.video import VideoStream
 from yolodetect import YoloDetect
 import os
 from dotenv import load_dotenv
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path=dotenv_path)
 dir_path = os.path.dirname(os.path.realpath(__file__))
+load_dotenv(dotenv_path=dotenv_path)
 
 model = YoloDetect()
-# video = VideoStream(src=dir_path + "/video.mp4").start()
-video = VideoStream(src=0).start()
-
+video = cv2.VideoCapture(0)
 points = []
 if(os.getenv("enable_send_telegram") == "0"):
     print("Gửi tin nhắn tới telegram đang bị vô hiệu hóa")
@@ -32,10 +29,13 @@ def draw_polygon (frame, points):
 
 detect = False
 while True:
-    frame = video.read()
+    ret, frame = video.read()
     frame = cv2.flip(frame, 1)
+    
+    if not ret:
+        print("Không thể đọc khung hình từ camera.")
+        break
 
-    # Ve ploygon
     frame = draw_polygon(frame, points)
 
     if detect:
@@ -49,9 +49,9 @@ while True:
         detect = True
 
     # show
-    cv2.imshow("IDS", frame)
+    cv2.imshow("IDS video", frame)
 
-    cv2.setMouseCallback('IDS', handle_left_click, points)
+    cv2.setMouseCallback('IDS video', handle_left_click, points)
 
-video.stop()
+video.release()
 cv2.destroyAllWindows()

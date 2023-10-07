@@ -15,10 +15,12 @@ load_dotenv(dotenv_path=dotenv_path)
 
 def isInside(points, centroid):
     polygon = Polygon(points)
+    if points == []: 
+        return polygon
     centroid = Point(centroid)
-    if(os.getenv("debug") =="1"): print(polygon.contains(centroid))
-    return polygon.contains(centroid)
-
+    result = polygon.contains(centroid)
+    if(os.getenv("debug") =="1"): print(result)
+    return result
 
 class YoloDetect():
     def __init__(self, detect_class="person"):
@@ -56,19 +58,20 @@ class YoloDetect():
         centroid = ((left + x_plus_w) // 2, (top + y_plus_h) // 2)
         cv2.circle(img, centroid, 5, (color), -1)
 
-        if isInside(points, centroid):
+        isInsided = isInside(points, centroid)
+        if isInsided and points != []:
             img = self.alert(img)
 
-        return isInside(points, centroid)
+        return isInsided
 
     def alert(self, img):
         cv2.putText(img, "ALARM!!!!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        # New thread to send telegram after 15 seconds
+        # New thread to send telegram
         timenow = datetime.datetime.utcnow()
         if (self.last_alert is None) or (
                 (timenow - self.last_alert).total_seconds() > self.alert_telegram_each):
             self.last_alert = timenow
-            cv2.imwrite(dir_path + "/alert.png", cv2.resize(img, dsize=None, fx=0.2, fy=0.2))
+            cv2.imwrite(dir_path + "/alert.png", cv2.resize(img, dsize=None, fx=0.3, fy=0.3))
             time = (timenow + datetime.timedelta(hours=7)).strftime("%Y-%m-%d %H:%M:%S")
             thread = threading.Thread(target=telegram.send_message_with_photo("ALARM!!!!" + "\n" + time + "\n", dir_path + "/alert.png"))
             thread.start()
@@ -79,7 +82,6 @@ class YoloDetect():
         self.model.setInput(blob)
         outs = self.model.forward(self.output_layers)
 
-        # Loc cac object trong khung hinh
         class_ids = []
         confidences = []
         boxes = []
