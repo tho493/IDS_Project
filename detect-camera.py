@@ -120,8 +120,7 @@ while cap.isOpened():
                         frame = alert(frame, total_person)
                         # sent alert to telegram
                         current_time = datetime.datetime.utcnow()
-                        if (track_id not in track_info):
-                            track_info[track_id] = None
+                        track_info.setdefault(track_id, None)
                         for tid, sent_time in list(track_info.items()):
                             if (sent_time is None) or tid == track_id and (current_time - sent_time).total_seconds() > sent_each:
                                 # sent tele
