@@ -1,10 +1,13 @@
 # import telebot  # pip install pyTelegramBotAPI
 import requests
+import os
+from dotenv import load_dotenv
+dir_path = os.path.dirname(os.path.realpath(__file__))
+dotenv_path = os.path.join(dir_path, '.env')
+load_dotenv(dotenv_path)
 
-
-chat_id = "1170615246"
-token = "6407537309:AAF_PAtoN5mgYBFN3HVmOmYLksMDgbQoQXA"
-
+chat_id = os.environ.get("TELEGRAM_TOKEN")
+token = os.environ.get("CHAT_ID")
 
 def send_message_with_photo(message, photo_path):
     url = f"https://api.telegram.org/bot{token}/sendPhoto"
@@ -18,10 +21,3 @@ def send_message_with_photo(message, photo_path):
         print(f"Đã gửi cảnh báo")
     else:
         print(f"Lỗi : {response.text}")
-
-# bot = telebot.TeleBot(token)
-
-
-# def send_message_with_photo(message, photo_path):
-#     photo = open(photo_path, 'rb')
-#     bot.send_photo(chat_id, photo, caption=message)

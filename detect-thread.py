@@ -9,25 +9,25 @@ from shapely.geometry.polygon import Polygon
 import datetime
 import os
 import telegram_utils as telegram
+import email_utils as email
+from dotenv import load_dotenv
 
 # Get path of current file
 dir_path = os.path.dirname(os.path.realpath(__file__))
-# telegram
-annotator = None
-sent_each = 15  # send each 15 seconds
 
+# Load .env
+dotenv_path = os.path.join(dir_path, '.env')
+load_dotenv(dotenv_path)
 
 def handle_left_click(event, x, y, flags, points):  # Define the mouse callback function
     if event == cv2.EVENT_LBUTTONDOWN:
         points.append([x, y])
-
 
 def isInside(box_points, center_point):  # Check if the center point is inside the box
     polygon = Polygon(box_points)
     center_point = Point(center_point)
     result = polygon.contains(center_point)
     return result
-
 
 def plot_bboxes(results, frame):
     annotator = Annotator(frame, 2)
@@ -38,24 +38,26 @@ def plot_bboxes(results, frame):
             box, color=colors(int(cls), True))
     return frame
 
-
 def alert(frame, total_person):
-    cv2.putText(frame, f"Canh bao!!!
-                Co {total_person} nguoi trong vung cam", (10, 30),
+    cv2.putText(frame, f"Canh bao!!! Co {total_person} nguoi trong vung cam", (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (50, 50, 255), 1)
     return frame
 
-
-def sent_alert(frame, total_person):
+def sent_alert(frame, total_person, current_time, index):
     # New thread to send telegram
-    current_time = datetime.datetime.utcnow()
-    cv2.imwrite(dir_path + f"/assets/alert.png",
+    cv2.imwrite(dir_path + f"/assets/image_alert_{index}.png",
                 cv2.resize(frame, dsize=None, fx=0.4, fy=0.4))
     time = (current_time + datetime.timedelta(hours=7)
             ).strftime("%Y-%m-%d %H:%M:%S")
-    telegram.send_message_with_photo(
-        f"Phát hiện có {total_person} người xâm nhập\n {time} \n", dir_path + f"/assets/alert.png")
-
+    sent_with = os.environ.get("SENT_WITH")
+    if(sent_with == "telegram"):
+        telegram.send_message_with_photo(
+            f"Phát hiện có {total_person} người xâm nhập\n {time} \n", dir_path + f"/assets/alert_{index}.png")
+    elif(sent_with == "email"):
+        email.send_email_with_image(os.environ.get("TO_EMAIL"), os.path.join(dir_path, "assets", "alert_{index}.png"),
+        f"Phát hiện có {total_person} người xâm nhập\n {time} \n")
+    else:
+        print("Not sent alert\nCheck TO_EMAIL or CHAT_ID in .env")
 
 def run_tracker_in_thread(filename, model, file_index):
     # Store the box points
@@ -64,6 +66,8 @@ def run_tracker_in_thread(filename, model, file_index):
     track_info = defaultdict(lambda: [])
     track_history = defaultdict(lambda: [])
     video = cv2.VideoCapture(filename, cv2.CAP_DSHOW)  # Read the video file
+    # Store variable sent alert
+    sent_each = 15  # send each 15 seconds
 
     while video.isOpened():
         ret, frame = video.read()  # Read the video frames
@@ -108,13 +112,13 @@ def run_tracker_in_thread(filename, model, file_index):
                             # add text alert to frame
                             frame = alert(frame, total_person)
                             # sent alert to telegram
-                            current_time = datetime.datetime.utcnow()
+                            current_time = datetime.datetime.now(datetime.UTC)
                             track_info.setdefault(track_id, None)
                             for tid, sent_time in list(track_info.items()):
                                 if (sent_time is None) or tid == track_id and (current_time - sent_time).total_seconds() > sent_each:
                                     # sent tele
                                     alert_thread = threading.Thread(
-                                        target=sent_alert, args=(frame, total_person))
+                                        target=sent_alert, args=(frame, total_person, current_time, file_index))
                                     alert_thread.start()
                                     # update sent time
                                     track_info[track_id] = current_time
@@ -141,8 +145,8 @@ def run_tracker_in_thread(filename, model, file_index):
 
 
 # Load the models
-model1 = YOLO('yolov8n.pt')
-model2 = YOLO('yolov8n.pt')  # -seg
+model1 = YOLO('yolo11n.pt')
+model2 = YOLO('yolo11n.pt')  # -seg
 
 # Define the video files for the trackers
 video_file1 = 0  # 0 for webcam
@@ -155,11 +159,11 @@ tracker_thread2 = threading.Thread(
     target=run_tracker_in_thread, args=(video_file2, model2, 2), daemon=True)
 
 # Start the tracker threads
-# tracker_thread1.start()
+tracker_thread1.start()
 tracker_thread2.start()
 
 # Wait for the tracker threads to finish
-# tracker_thread1.join()
+tracker_thread1.join()
 tracker_thread2.join()
 
 # Clean up and close windows
