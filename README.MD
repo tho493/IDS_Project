@@ -16,8 +16,8 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
 
 ### Yêu cầu
 
-- Biết sơ lược qua về python
-- Cần một số phần mềm chỉnh sửa file, khuyến khích sử dụng [notepad++](https://notepad-plus-plus.org/downloads/) hoặc [sublime text 3](https://www.sublimetext.com/3)
+- Biết sơ lược về python
+- Cần một số phần mềm chỉnh sửa file, có thể sử dụng sử dụng [notepad++](https://notepad-plus-plus.org/downloads/) hoặc [sublime text 3](https://www.sublimetext.com/3)
 
 ### Cài đặt
 
