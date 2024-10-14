@@ -24,8 +24,8 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
 1. Tải về [Python](https://www.python.org/downloads/) và [git](https://git-scm.com/) sau đó cài đặt
 
 2. Clone source code
-   1. chuột phải ở folder cần cài đặt source code nhấn vào git bash
-   2. nhập
+   1. Chuột phải ở folder cần cài đặt source code nhấn vào git bash
+   2. Nhập
 
 ```
 git clone https://github.com/tho493/IDS_Project.git
@@ -36,11 +36,11 @@ git clone https://github.com/tho493/IDS_Project.git
    2. Nhập
 
 ```
-pip install -r setup.txt
+pip install -r requirements.txt
 ```
 
-4. Chạy file detect.
+4. Run file detect.
 
 ## Contact
 
-tho493 - [Facebook](https://facebook.com/tho493) - [GitHub](https://github.com/tho493) - chitho040903@gmail.com
+tho493 - [Facebook](https://facebook.com/tho493) - [GitHub](https://github.com/tho493) - [Gmail](mailto:chitho040903@gmail.com)
