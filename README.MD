@@ -1,7 +1,7 @@
 <h3 align="center">IDS Project</h3>
 
 <p align="center">
-    Hệ thống phát hiện người xâm nhập trong vùng được chọn. Sử dụng YoloV8
+    Hệ thống phát hiện người xâm nhập trong vùng được chọn. Sử dụng YoloV11
     <br />
     <br />
     <a href="https://github.com/tho493/IDS_Project/issues">Report Bug</a>

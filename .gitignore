@@ -5,3 +5,4 @@ assets/alert_2.png
 .idea
 .env
 demo.mp4
+__pycache__
