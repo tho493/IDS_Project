@@ -1,15 +1,6 @@
-# import telebot  # pip install pyTelegramBotAPI
 import requests
-import os
-from dotenv import load_dotenv
-dir_path = os.path.dirname(os.path.realpath(__file__))
-dotenv_path = os.path.join(dir_path, '.env')
-load_dotenv(dotenv_path)
 
-chat_id = os.environ.get("CHAT_ID")
-token = os.environ.get("TELEGRAM_TOKEN")
-
-def send_message_with_photo(message, photo_path):
+def send_message_with_photo(message, photo_path, chat_id, token):
     url = f"https://api.telegram.org/bot{token}/sendPhoto"
     files = {'photo': open(photo_path, 'rb')}
     data = {

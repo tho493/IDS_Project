@@ -19,6 +19,14 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 dotenv_path = os.path.join(dir_path, '.env')
 load_dotenv(dotenv_path)
 
+# telegram
+telegram_token = os.environ.get("TELEGRAM_TOKEN")
+chat_id = os.environ.get("CHAT_ID")
+
+# email
+from_email = os.environ.get("EMAIL")
+password_email = os.environ.get("PASSWORD_EMAIL")
+
 def handle_left_click(event, x, y, flags, points):  # Define the mouse callback function
     if event == cv2.EVENT_LBUTTONDOWN:
         points.append([x, y])
@@ -52,10 +60,10 @@ def sent_alert(frame, total_person, current_time, index):
     sent_with = os.environ.get("SENT_WITH")
     if(sent_with == "telegram"):
         telegram.send_message_with_photo(
-            f"Phát hiện có {total_person} người xâm nhập\n {time} \n", dir_path + f"/assets/alert_{index}.png")
+            f"Phát hiện có {total_person} người xâm nhập\n {time} \n", dir_path + f"/assets/alert_{index}.png",chat_id, telegram_token)
     elif(sent_with == "email"):
         email.send_email_with_image(os.environ.get("TO_EMAIL"), os.path.join(dir_path, "assets", "alert_{index}.png"),
-        f"Phát hiện có {total_person} người xâm nhập\n {time} \n")
+        f"Phát hiện có {total_person} người xâm nhập\n {time} \n", from_email, password_email)
     else:
         print("Not sent alert\nCheck TO_EMAIL or CHAT_ID in .env")
 
@@ -67,7 +75,7 @@ def run_tracker_in_thread(filename, model, file_index):
     track_history = defaultdict(lambda: [])
     video = cv2.VideoCapture(filename, cv2.CAP_DSHOW)  # Read the video file
     # Store variable sent alert
-    sent_each = 15  # send each 15 seconds
+    sent_each = int(os.environ.get("SENT_EACH"))
 
     while video.isOpened():
         ret, frame = video.read()  # Read the video frames

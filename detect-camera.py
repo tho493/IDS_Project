@@ -10,14 +10,15 @@ import telegram_utils as telegram
 import email_utils as email
 import datetime
 import threading
+from dotenv import load_dotenv
+
 
 # Load the YOLOv8 model
 model = YOLO('yolo11n.pt')
 
-
 # Open webcam
 # 0 for the default webcam, you can change it if you have multiple webcams
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 
 # Store the track history
 track_history = defaultdict(lambda: [])
@@ -30,8 +31,18 @@ detected = False
 # Get path of current file
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+# Load .env
+dotenv_path = os.path.join(dir_path, '.env')
+load_dotenv(dotenv_path)
+
 # telegram
-sent_each = 15  # send each 15 seconds
+sent_each = int(os.environ.get("SENT_EACH"))
+telegram_token = os.environ.get("TELEGRAM_TOKEN")
+chat_id = os.environ.get("CHAT_ID")
+
+# email
+from_email = os.environ.get("EMAIL")
+password_email = os.environ.get("PASSWORD_EMAIL")
 
 ############### Function ##################
 def handle_left_click(event, x, y, flags, points):  # Define the mouse callback function
@@ -71,10 +82,10 @@ def sent_alert(frame, total_person, current_time):
         sent_with = os.environ.get("SENT_WITH")
         if(sent_with == "telegram"):
             telegram.send_message_with_photo(
-                f"Phát hiện có {total_person} người xâm nhập\n {time} \n", os.path.join(dir_path, "assets", "alert.png"))
+                f"Phát hiện có {total_person} người xâm nhập\n {time} \n", os.path.join(dir_path, "assets", "alert.png"),chat_id, telegram_token)
         elif(sent_with == "email"):
             email.send_email_with_image(os.environ.get("TO_EMAIL"), os.path.join(dir_path, "assets", "alert.png"),
-            f"Phát hiện có {total_person} người xâm nhập\n {time} \n")
+            f"Phát hiện có {total_person} người xâm nhập\n {time} \n", from_email, password_email)
         else:
             print("Not sent alert\nCheck TO_EMAIL or CHAT_ID in .env")
 ############### End Function ##################
